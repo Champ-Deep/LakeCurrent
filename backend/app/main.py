@@ -21,7 +21,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="LakeCurrent",
-    description="The Data Reservoir Series - Search & Intelligence Platform",
+    description="Comprehensive Search API for LakeB2B Agents",
     version="0.1.0",
     lifespan=lifespan,
 )

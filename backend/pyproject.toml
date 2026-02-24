@@ -1,7 +1,7 @@
 [project]
 name = "lakecurrent"
 version = "0.1.0"
-description = "LakeCurrent - The Data Reservoir Series Search Platform"
+description = "LakeCurrent - Comprehensive Search API for LakeB2B Agents"
 readme = "../README.md"
 requires-python = ">=3.11"
 authors = [{name = "Champ-Deep"}]

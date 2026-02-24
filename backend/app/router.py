@@ -34,36 +34,40 @@ async def health():
 @router.get("/search")
 async def search(
     q: str = Query(..., min_length=1, max_length=500, description="The search query"),
-    mode: Literal["filter", "glimpse", "current"] = Query(
-        default="filter",
-        description="Search mode: filter (LakeFilter), glimpse (LakeGlimpse), current (LakeCurrent)",
+    mode: Literal["auto", "filter", "glimpse"] | None = Query(
+        default=None,
+        description=(
+            "Search engine selection. "
+            "auto (default): LakeCurrent picks the best engine. "
+            "filter: LakeFilter meta-search aggregation. "
+            "glimpse: LakeGlimpse quick SERP lookup."
+        ),
     ),
-    categories: str | None = Query(None, description="Categories for LakeFilter"),
-    language: str | None = Query(None, description="Language for LakeFilter"),
+    categories: str | None = Query(None, description="Categories (LakeFilter only)"),
+    language: str | None = Query(None, description="Language (LakeFilter only)"),
     pageno: int = Query(default=1, ge=1, le=100),
     limit: int = Query(default=settings.default_result_limit, ge=1, le=50),
 ):
-    """LakeSource - The definitive starting point for all internal lookups."""
+    """LakeCurrent search — routes queries through available search engines."""
+    effective_mode = mode or "auto"
+
     try:
-        if mode == "glimpse":
+        if effective_mode == "glimpse":
             response = await _lakeglimpse.search(q)
-        elif mode == "current":
-            return JSONResponse(
-                status_code=501,
-                content={"detail": "LakeCurrent integration is coming soon."},
-            )
         else:
+            # Both "auto" and "filter" route to LakeFilter for now.
+            # "auto" is the future hook for smart routing and fallback logic.
             response = await _lakefilter.search(
                 q, categories=categories, language=language, pageno=pageno
             )
     except (httpx.HTTPStatusError, httpx.TimeoutException, httpx.ConnectError):
-        logger.exception("Search backend (%s) failed", mode)
+        logger.exception("Search backend (%s) failed", effective_mode)
         return JSONResponse(
-            status_code=503 if mode == "glimpse" else 502,
-            content={"detail": f"Search backend ({mode}) is unavailable"},
+            status_code=503 if effective_mode == "glimpse" else 502,
+            content={"detail": f"Search backend ({effective_mode}) is unavailable"},
         )
     except Exception:
-        logger.exception("Unexpected error in search (%s)", mode)
+        logger.exception("Unexpected error in search (%s)", effective_mode)
         return JSONResponse(
             status_code=500,
             content={"detail": "Internal search error"},

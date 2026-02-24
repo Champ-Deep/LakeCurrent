@@ -157,6 +157,26 @@ async def test_pageno_zero_returns_422(client):
     assert response.status_code == 422
 
 
+# --- Mode routing tests ---
+
+
+@respx.mock
+async def test_explicit_auto_mode_routes_to_lakefilter(client, lakefilter_json):
+    route = respx.get("http://lakefilter:8080/search").mock(
+        return_value=httpx.Response(200, json=lakefilter_json)
+    )
+    response = await client.get("/search", params={"q": "test", "mode": "auto"})
+    assert response.status_code == 200
+    assert route.called
+    data = response.json()
+    assert len(data["results"]) > 0
+
+
+async def test_invalid_mode_returns_422(client):
+    response = await client.get("/search", params={"q": "test", "mode": "current"})
+    assert response.status_code == 422
+
+
 # --- Parameter forwarding test ---
 
 

@@ -1,47 +1,110 @@
 # LakeCurrent
 
-**LakeCurrent** is the search and intelligence hub for the **LakeB2B** Data Reservoir series. It provides a unified interface for deep, private, and real-time data lookups, ensuring a clean and modern flow of information.
+**LakeCurrent** is a comprehensive search API built by **LakeB2B** as a self-hosted alternative to the Brave Search API. It provides a single, unified endpoint for web search — purpose-built for verification agents, qualification agents, sales agents, customer service agents, and scrapers.
 
-## The Data Reservoir Nomenclature
+## How It Works
 
-In alignment with the LakeB2B ecosystem, this project uses a water-themed naming convention for its core components:
+LakeCurrent routes search queries through its internal engines and returns clean, structured JSON results.
 
-| Component | Role |
+| Engine | What It Does |
 | :--- | :--- |
-| **LakeSource** | The definitive starting point for all internal search queries (FastAPI Router). |
-| **LakeFilter** | Aggregates and cleans results from multiple data streams to ensure purity. |
-| **LakeGlimpse** | A quick, private glimpse into search results via a privacy-focused reflection. |
-| **LakeCurrent** | The fast, modern flow of real-time search data (namesake of the project). |
+| **LakeFilter** | Meta-search aggregation across Google, Bing, DuckDuckGo, Qwant, and Mojeek. Returns ranked, deduplicated results with scores and metadata. |
+| **LakeGlimpse** | Quick, privacy-focused SERP lookup. Returns Google results without tracking. |
 
----
+By default, LakeCurrent automatically selects the best engine for your query. You can also specify an engine explicitly via the `mode` parameter.
 
-## Architecture
+## Quick Start
 
-- **Backend**: FastAPI (Python 3.11+)
-- **Components**:
-    - LakeFilter (meta-search aggregation)
-    - LakeGlimpse (private search reflection)
-    - LakeCurrent (real-time search API)
-- **Deployment**: Docker Compose
+1. Copy the environment file:
+   ```bash
+   cp .env.example .env
+   ```
 
-## Getting Started
-
-1. **Environment Setup**:
-   Copy `.env.example` to `.env` and fill in your API keys.
-
-2. **Launch**:
+2. Launch with Docker Compose:
    ```bash
    docker-compose up -d
    ```
 
-3. **API Access**:
-   The API will be available at `http://localhost:8001/docs`.
+3. Search:
+   ```bash
+   curl "http://localhost:8001/search?q=python+web+framework"
+   ```
 
-## API Endpoints
+4. Interactive API docs: [http://localhost:8001/docs](http://localhost:8001/docs)
 
-| Endpoint | Description |
-| :--- | :--- |
-| `GET /search?q=...&mode=filter` | Search via LakeFilter (default mode) |
-| `GET /search?q=...&mode=glimpse` | Search via LakeGlimpse |
-| `GET /search?q=...&mode=current` | Search via LakeCurrent (coming soon) |
-| `GET /health` | Health check for all components |
+## API
+
+### `GET /search`
+
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `q` | string | *required* | Search query (1–500 chars) |
+| `mode` | string | `auto` | `auto`, `filter`, or `glimpse` |
+| `categories` | string | — | Categories for LakeFilter (e.g. `news`, `images`) |
+| `language` | string | — | Language for LakeFilter |
+| `pageno` | int | `1` | Page number (1–100) |
+| `limit` | int | `5` | Max results to return (1–50) |
+
+**Example response:**
+```json
+{
+  "query": "python web framework",
+  "results": [
+    {
+      "url": "https://example.com",
+      "title": "Example Result",
+      "snippet": "A brief description of the result.",
+      "engine": "google",
+      "score": 3.5
+    }
+  ],
+  "suggestions": [],
+  "answers": []
+}
+```
+
+### `GET /health`
+
+Returns the status of all search engines.
+
+```json
+{
+  "status": "healthy",
+  "components": {
+    "LakeFilter": "ok",
+    "LakeGlimpse": "ok"
+  }
+}
+```
+
+## Architecture
+
+```
+┌──────────────────────────────────────────┐
+│              LakeCurrent API             │
+│            (FastAPI, Python 3.11+)       │
+│                                          │
+│   GET /search ──► auto / filter / glimpse│
+│   GET /health                            │
+└─────────┬───────────────┬────────────────┘
+          │               │
+    ┌─────▼─────┐   ┌────▼──────┐
+    │ LakeFilter │   │LakeGlimpse│
+    │  (SearXNG) │   │ (Whoogle) │
+    └─────┬──────┘   └───────────┘
+          │
+    ┌─────▼─────┐
+    │   Valkey   │
+    │  (Cache)   │
+    └────────────┘
+```
+
+All services run as Docker containers on a single bridge network.
+
+## Development
+
+```bash
+cd backend
+pip install -e ".[dev]"
+pytest tests/ -v
+```
