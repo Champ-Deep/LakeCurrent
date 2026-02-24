@@ -1,0 +1,47 @@
+{
+  "query": "python web framework",
+  "number_of_results": 12500,
+  "results": [
+    {
+      "url": "https://flask.palletsprojects.com/",
+      "title": "Flask – A Python Microframework",
+      "content": "Flask is a lightweight WSGI web application framework. It is designed to make getting started quick and easy.",
+      "engine": "google",
+      "engines": ["google", "bing"],
+      "score": 0.92,
+      "category": "general",
+      "publishedDate": "2024-06-15"
+    },
+    {
+      "url": "https://www.djangoproject.com/",
+      "title": "Django – The Web framework for perfectionists with deadlines",
+      "content": "Django makes it easier to build better web apps more quickly and with less code.",
+      "engine": "bing",
+      "engines": ["bing", "duckduckgo"],
+      "score": 0.88,
+      "category": "general",
+      "publishedDate": null
+    },
+    {
+      "url": "https://fastapi.tiangolo.com/",
+      "title": "FastAPI – Modern Python web framework",
+      "content": "FastAPI is a modern, fast (high-performance), web framework for building APIs with Python based on standard Python type hints.",
+      "engine": "duckduckgo",
+      "engines": ["duckduckgo"],
+      "score": 0.85,
+      "category": "general"
+    }
+  ],
+  "answers": [
+    "Popular Python web frameworks include Django, Flask, and FastAPI."
+  ],
+  "suggestions": [
+    "best python web framework 2024",
+    "python async web framework"
+  ],
+  "corrections": [],
+  "infoboxes": [],
+  "unresponsive_engines": [
+    ["qwant", "timeout"]
+  ]
+}
