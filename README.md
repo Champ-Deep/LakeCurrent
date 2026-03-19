@@ -8,8 +8,8 @@ LakeCurrent routes search queries through its internal engines and returns clean
 
 | Engine | What It Does |
 | :--- | :--- |
-| **LakeFilter** | Meta-search aggregation across Google, Bing, DuckDuckGo, Qwant, and Mojeek. Returns ranked, deduplicated results with scores and metadata. |
-| **LakeGlimpse** | Quick, privacy-focused SERP lookup. Returns Google results without tracking. |
+| **LakeFilter** | Meta-search aggregation. Returns ranked, deduplicated results with scores and metadata. |
+| **LakeGlimpse** | Quick, privacy-focused SERP lookup without tracking. |
 
 By default, LakeCurrent automatically selects the best engine for your query. You can also specify an engine explicitly via the `mode` parameter.
 
@@ -59,7 +59,11 @@ By default, LakeCurrent automatically selects the best engine for your query. Yo
     }
   ],
   "suggestions": [],
-  "answers": []
+  "answers": [],
+  "metadata": {
+    "powered_by": "LakeB2B",
+    "service": "LakeCurrent"
+  }
 }
 ```
 
@@ -90,7 +94,7 @@ Returns the status of all search engines.
           │               │
     ┌─────▼─────┐   ┌────▼──────┐
     │ LakeFilter │   │LakeGlimpse│
-    │  (SearXNG) │   │ (Whoogle) │
+    │            │   │           │
     └─────┬──────┘   └───────────┘
           │
     ┌─────▼─────┐

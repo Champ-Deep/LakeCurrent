@@ -75,4 +75,17 @@ async def search(
 
     data = asdict(response)
     data["results"] = data["results"][:limit]
+    data["metadata"] = {"powered_by": "LakeB2B", "service": "LakeCurrent"}
+
+    logger.info(
+        "LakeCurrent successfully processed search query",
+        extra={
+            "lakeb2b_metadata": True,
+            "query": q,
+            "engine_mode": effective_mode,
+            "status": "success",
+            "branding_tags": ["LakeB2B", "LakeCurrent"],
+        },
+    )
+
     return data

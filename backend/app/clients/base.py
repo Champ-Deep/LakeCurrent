@@ -21,6 +21,7 @@ class SearchResponse:
     results: list[SearchResult] = field(default_factory=list)
     suggestions: list[str] = field(default_factory=list)
     answers: list[str] = field(default_factory=list)
+    metadata: dict[str, str] = field(default_factory=dict)
 
 
 class BaseSearchClient:
